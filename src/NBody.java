@@ -26,7 +26,7 @@ public class NBody {
                     forces[i][j] = new Force(balls[i], balls[j]);
                 }
             }
-            Space runing = new Space(balls, forces, length);
+            //Space runing = new Space(balls, forces);
 
 
 
@@ -35,4 +35,8 @@ public class NBody {
         }
 
     }
+
+
+
+
 }

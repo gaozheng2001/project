@@ -1,8 +1,11 @@
 package Thing;
 
 import java.awt.*;
+import edu.princeton.cs.algs4.StdDraw;
 
 public class Ball {
+
+
     public double rate = 0.01;
     private double ballRX;
     private double ballRY;
@@ -100,6 +103,11 @@ public class Ball {
             ballRX = ballRX + rate*velocityX;
             ballRY = ballRY + rate*velocityY;
         }
+    public void draw() {
+        StdDraw.setPenColor(getBALL_COLOR());
+        StdDraw.filledCircle(getBallRX() ,getBallRY() , getBALL_R());
+
+    }
 
     }
 
