@@ -42,11 +42,25 @@ public class Space {
     }
 
     public void creshing(Ball ball1, Ball ball2){
-        double dr = Math.sqrt(Math.pow(ball1.getBALL_R() + ball2.getBall_R(), 2) - getDistance(ball1, ball2));
-        double dx = (ball1.getBallRX() - ball2.getBallRX());
-        double dy = (ball1.getBallRY() - ball2.getBallRY());
+        double dr = (ball1.getBALL_R() + ball2.getBall_R()) - Math.sqrt(getDistance(ball1, ball2)));
+        double dX = (ball1.getBallRX() - ball2.getBallRX());
+        double dY = (ball1.getBallRY() - ball2.getBallRY());
         //1、2球的球心连线与x轴正方向的夹角，以2球为角的顶点。
-        double angle = dx == 0 ? Math.acos(dx/dr) : Math.asin(dy/dr);
+        double dq = dr/Math.sqrt(getDistance(ball1, ball2));
+        double dx = dX*dq;
+        double dy = dY*dq;
+        if (ball1.getBAllRx() < ball2.getBallRx()){
+            ball1.getBallRx() = ball1.getBallRx()-dx/2;
+            ball1.getBallRy() = ball1.getBallRy()-dy/2;
+            ball2.getBallRx() = ball1.getBallRx()+dx/2;
+            ball2.getBallRy() = ball2.getballRy()+dy/2;
+
+        }else{
+            ball1.getBallRx() = ball1.getBallRx()+dx/2;
+            ball1.getBallRy() = ball1.getBallRy()+dy/2;
+            ball2.getBallRx() = ball1.getBallRx()-dx/2;
+            ball2.getBallRy() = ball2.getballRy()-dy/2;
+        }
 
         //将嵌入另一个球的坐标回退至两球恰好相切的状态，默认速度大的球嵌入速度小的球
         //该部分仍需优化
