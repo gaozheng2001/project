@@ -11,10 +11,20 @@ public class Space {
     public int rate = 1; // 刷新频率
 
 
-    public Space(Ball[] balls, Force[][] forces, int BoardLength){
+    public Space(Ball[] balls,  int BoardLength){
         this.balls = balls;
-        this.forces = forces;
+        this.forces = CreateForce();
         this.boardlength = BoardLength;
+    }
+    public Force[][] CreateForce(){
+        int n = balls.length;
+        Force[][] forces = new Force[n][n];
+        for(int i =0 ; i < n-1 ; i++){
+            for (int j = i+1; j<n ; j++){
+                forces[i][j] = new Force(balls[i] , balls[j]);
+            }
+        }
+        return forces;
     }
 
     public double getDistance(Ball ball1 , Ball ball2){
@@ -111,6 +121,12 @@ public class Space {
     public void repaint(Ball[] balls){
         StdDraw.clear();
         int n =balls.length;
+        for (int i =0; i <n; i++){
+            for (int j = i+1; j < n; j++){
+                forces[i][j].ChangeVelocityX();
+                forces[i][j].ChangeVelocityY();
+            }
+        }
         for (Ball ball : balls) {
             ball.draw(1);
         }
@@ -121,13 +137,19 @@ public class Space {
             ballcheck(balls);
             ball.ballMove();
         }
+        for (int i =0; i <n; i++){
+            for (int j = i+1; j < n; j++){
+                forces[i][j].setForce_x();
+                forces[i][j].setForce_y();
+            }
+        }
         //每过10ms利用缓存将数组中全部的小球移动+画出+清屏
         try{
             Thread.sleep(rate);
-        }catch(Exception ef) {};
+        }catch(Exception ef) {}
     }
 
-    public void run(Ball[] balls) {
+    public void run() {
         StdDraw.setCanvasSize(boardlength, boardlength);
         StdDraw.enableDoubleBuffering();
         while(true) {
@@ -139,15 +161,21 @@ public class Space {
      *调试
      */
     public static void main(String[] args) {
-     Ball ball1 = new Ball(0.1,0.5,1,0,0.01,1,0,250,0);
-     Ball ball2 = new Ball(0.48,0.5,0,0,0.01,1,250,0,0);
-     Ball ball3 = new Ball(0.5,0.5,0,0,0.01,1,250,0,250);
-     Ball ball4 = new Ball(0.52,0.5,0,0,0.01,1,100,100,0);
-     Ball ball5 = new Ball(0.54,0.5,0,0,0.01,1,100,0,100);
-     Ball[] balls = {ball1, ball2, ball3, ball4, ball5};
-     Force[][] forces = null;
-     Space space = new Space(balls, forces, 800);
-     space.run(balls);
+     //Ball ball1 = new Ball(0.1,0.5,1,0,0.01,1,0,250,0);
+     //Ball ball2 = new Ball(0.48,0.5,0,0,0.01,1,250,0,0);
+     //Ball ball3 = new Ball(0.5,0.5,0,0,0.01,1,250,0,250);
+     //Ball ball4 = new Ball(0.52,0.5,0,0,0.01,1,100,100,0);
+     //Ball ball5 = new Ball(0.54,0.5,0,0,0.01,1,100,0,100);
+     //Ball[] balls = {ball1, ball2, ball3, ball4, ball5};
+     //Force[][] forces = null;
+     //Space space = new Space(balls, 800);
+     //space.run(balls);
+        Ball ball1 = new Ball(0.2,0.2,0,0,0.03,1000000000,50,50,50);
+        Ball ball2 = new Ball(0.8,0.8,0,0,0.01,1000000000,50,50,50);
+        Ball[] balls = {ball1 , ball2};
+
+        Space space = new Space(balls, 800);
+        space.run();
 
     }
 }
