@@ -16,6 +16,7 @@ public class Space {
     public double[][] questionslist;
     public boolean show ;//是否打印
     public int colculate = 0;//计算的次数
+    public int hasanswered = 0;//已输出的问题个数
 
 
     public Space(Ball[] balls, int BoardLength, double[][] questionslist, boolean show){
@@ -38,7 +39,7 @@ public class Space {
     }
 
     /**
-     * 极端两校求间距的平方
+     * 获得两小球间距的平方
      * @return 球心间距的平方
      */
     public double getDistance(Ball ball1 , Ball ball2){
@@ -70,7 +71,7 @@ public class Space {
 
     /**
      * 针对碰撞过程中小球的坐标和速度的更新
-     * 坐标变化：小球相互嵌入式零七回退至两球刚好相切
+     * 坐标变化：小球相互嵌入时令其回退至两球刚好相切
      * 速度更新：将小球速度坐标系变为两小球球心连线为横坐标。
      * @param ball1 第一个小球
      * @param ball2 另一个小球
@@ -260,11 +261,12 @@ public class Space {
             if (time - 0.5 * rate / 1000 < doubles[0] && time + 0.5 * rate / 1000 > doubles[0]) {
                 int index = (int) doubles[1];
                 if (!show) {
-                    //StdOut.printf("\n" + time + "\n");//打印当前时间
-                    StdOut.printf("\n" + balls[index].getBallRX() * boardlength + " " +
+                    //StdOut.println(time);//打印当前时间
+                    StdOut.println(balls[index].getBallRX() * boardlength + " " +
                             balls[index].getBallRY() * boardlength + " " +
                             balls[index].getVelocityX() * boardlength + " " +
-                            balls[index].getVelocityY() * boardlength + "\n");
+                            balls[index].getVelocityY() * boardlength);
+                    hasanswered++;
                 }
             }
         }
@@ -328,9 +330,10 @@ public class Space {
             StdDraw.setCanvasSize(800, 800);
             StdDraw.enableDoubleBuffering();//GUI缓存区
         }
-        while(true) {
+        while((show ? true:hasanswered < questionslist.length)) {
             repaint(balls);
         }
+        System.exit(0);
     }
 
     /**

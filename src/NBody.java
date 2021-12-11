@@ -6,9 +6,9 @@ public class NBody {
 
     public static void main(String[] args) {
         try {
-            //String path = args[0];
-            String path = "C:/Users/11520/Desktop/testdata (2)/body3-ter.txt";
-            //String path = "C:/Users/11520/Desktop/testdata (2)/chain-ter.txt";
+            String path = args[0];
+            //String path = "C:/Users/11520/Desktop/testdata (2)/body3-gui.txt";
+            //String path = "C:/Users/11520/Desktop/testdata (2)/chain-gui.txt";
             In in = new In(path);
 
             //读取命令参数控制是否显示GUI及打印问题结果
