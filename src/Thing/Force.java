@@ -1,7 +1,7 @@
 package Thing;
 
 public class Force {
-    public double rate = 0.001;
+    public double rate = 1.0/1000;//单位s
     public static final double G = 6.67E-11;
     private Ball ball1;
     private Ball ball2;
@@ -9,14 +9,6 @@ public class Force {
     private double force_y;
     private double dx;
     private double dy;
-
-    public double getForce_x() {
-        return force_x;
-    }
-
-    public double getForce_y() {
-        return force_y;
-    }
 
     public double R;
 
@@ -31,6 +23,7 @@ public class Force {
         this.force_x = ForceX();
         this.force_y = ForceY();
     }
+
     public void setForce_x() {
         this.force_x = ForceX();
     }
@@ -40,57 +33,45 @@ public class Force {
     }
 
     private double ForceX(){
-        return G*this.ball1.getMass()*this.ball2.getMass()/(this.R*this.R*this.R);
+        return G * ball1.getMass() * ball2.getMass() * dx/(R * R * R);
     }
 
     private double ForceY(){
-        return G*this.ball1.getMass()*this.ball2.getMass()/(this.R*this.R*this.R);
+        return G * ball1.getMass() * ball2.getMass() * dy/(R * R * R);
     }
 
-
-    public void ChangeVelocityX(){
+    /**
+     * 更新小球的x轴向速度
+     */
+    public void ChangeVelocityX(int boardlength){
         double ball1_mess = ball1.getMass();
         double ball2_mess = ball2.getMass();
-        double ball1_x = ball1.getBallRX();
-        double ball2_x = ball2.getBallRX();
-        double location = ball2_x - ball1_x;//计算相对位置
         double ball1_v = ball1.getVelocityX();
         double ball2_v = ball2.getVelocityX();
-        if(location<0) {
-            ball1_v = ball1_v - rate * force_x / ball1_mess;
-            ball2_v = ball2_v + rate * force_x / ball2_mess;
-        }
-        if(location>0){
-            ball1_v = ball1_v + rate * force_x / ball1_mess;
-            ball2_v = ball2_v - rate * force_x / ball2_mess;
-        }
+
+        ball1_v -= 100* rate * force_x / (ball1_mess * boardlength);
+        ball2_v += 100* rate * force_x / (ball2_mess * boardlength);
+
         ball1.setVelocityX(ball1_v);
         ball2.setVelocityX(ball2_v);
     }
 
-    public void ChangeVelocityY(){
+    /**
+     * 更新小球的y轴向速度
+     */
+    public void ChangeVelocityY(int boardlength){
         double ball1_mess = ball1.getMass();
         double ball2_mess = ball2.getMass();
-        double ball1_y = ball1.getBallRY();
-        double ball2_y = ball2.getBallRY();
-        double location = ball2_y - ball1_y;
         double ball1_v = ball1.getVelocityY();
         double ball2_v = ball2.getVelocityY();
-        if(location<0) {
-            ball1_v = ball1_v - rate * force_y / ball1_mess;
-            ball2_v = ball2_v + rate * force_y / ball2_mess;
-        }
-        if(location>0){
-            ball1_v = ball1_v + rate * force_y / ball1_mess;
-            ball2_v = ball2_v - rate * force_y / ball2_mess;
-        }
+
+        ball1_v -= rate * force_y / (ball1_mess * boardlength);
+        ball2_v += rate * force_y / (ball2_mess * boardlength);
 
         ball1.setVelocityY(ball1_v);
         ball2.setVelocityY(ball2_v);
     }
 
-
     public static void main(String[] args) {
     }
-
 }

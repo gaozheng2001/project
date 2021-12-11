@@ -14,7 +14,8 @@ public class Space {
     public int rate = 1; // GUI刷新频率：1ms
     public double time = 0;//绝对时间
     public double[][] questionslist;
-    public boolean show ;
+    public boolean show ;//是否打印
+    public int colculate = 0;//计算的次数
 
 
     public Space(Ball[] balls, int BoardLength, double[][] questionslist, boolean show){
@@ -36,11 +37,18 @@ public class Space {
         return forces;
     }
 
+    /**
+     * 极端两校求间距的平方
+     * @return 球心间距的平方
+     */
     public double getDistance(Ball ball1 , Ball ball2){
         return Math.pow(ball2.getBallRX() - ball1.getBallRX(), 2) +
                 Math.pow(ball2.getBallRY() - ball1.getBallRY(), 2);
-    }//返回两个球的距离的平方
+    }
 
+    /**
+     * 判断两小球是否相交
+     */
     public boolean checkCrash(Ball ball1 , Ball ball2) {
         double distance = getDistance(ball1, ball2);
         return distance <= Math.pow(ball1.getBALL_R() + ball2.getBall_R(), 2);
@@ -75,6 +83,7 @@ public class Space {
         if (sqrt(getDistance(ball1,ball2)) > (ball1.getBALL_R() + ball2.getBall_R()))
             return;
 
+
         //第二步：计算合速度的大小和方向
         //计算ball1的合速度的值（不包含方向）
         double ball1v = sqrt((ball1.getVelocityX()*ball1.getVelocityX()) + (ball1.getVelocityY()*ball1.getVelocityY()));
@@ -89,6 +98,8 @@ public class Space {
         double ball2_angle = acos(ball2.getVelocityX()/ball2v*1);
         if (ball2.getVelocityY() != 0)
             ball2_angle *= ball2.getVelocityY()/abs(ball2.getVelocityY());
+
+
         //第三步：计算共同坐标系s，以及ball1和ball2在s中的速度的大小和方向
         //第三步：第一部分：计算共同坐标系s的参数
         //计算ball1球心相对于ball2球心的坐标（注意y轴为数学上的y轴，与计算机中的y轴相反）
@@ -107,23 +118,13 @@ public class Space {
             double de = ((ball1.getBALL_R() + ball2.getBall_R())-sqrt(getDistance(ball1, ball2)))/2;
             double dxx = de * cos(s_angle);
             double dyy = de * sin(s_angle);
-            double ball1_lx = ball1.getBallRX();
-            ball1_lx -= dxx ;
-            ball1.setBallRX(ball1_lx);
-            double ball1_ly = ball1.getBallRY();
-            ball1_ly -= dyy ;
-            ball1.setBallRY(ball1_ly);
-            double ball2_lx = ball2.getBallRX();
-            ball2_lx += dxx ;
-            ball2.setBallRX(ball2_lx);
-            double ball2_ly = ball2.getBallRY();
-            ball2_ly += dyy ;
-            ball2.setBallRY(ball2_ly);
-
-
+            ball1.setBallRX(ball1.getBallRX() - dxx);
+            ball1.setBallRY(ball1.getBallRY() - dyy);
+            ball2.setBallRX(ball2.getBallRX() + dxx);
+            ball2.setBallRY(ball2.getBallRY() + dyy);
         }
-        //第三步：第三部分：将ball1,ball2的速度大小和方向由原坐标系转化为在共同坐标系s中的速度大小和方向
 
+        //第三步：第三部分：将ball1,ball2的速度大小和方向由原坐标系转化为在共同坐标系s中的速度大小和方向
         // 在s坐标系中ball1的新运动方向
         double s_ball1_angle = ball1_angle - s_angle;
         // 在s坐标系中ball1的新速度大小
@@ -142,8 +143,8 @@ public class Space {
         // 在s坐标系中ball2的新速度在s的y轴上的投影
         double s_ball2_vy = s_ball2_v * sin(s_ball2_angle);
 
-        //第四步：发生完全弹性斜碰时，在s坐标系中，两球y轴速度不变，x轴速度满足完全弹性正碰（由动能定理和动量守恒推导）
 
+        //第四步：发生完全弹性斜碰时，在s坐标系中，两球y轴速度不变，x轴速度满足完全弹性正碰（由动能定理和动量守恒推导）
         // 碰撞后ball1的s坐标系x轴的分速度
         double s_ball1_vxfinal = ((ball1.getMass() - ball2.getMass()) * s_ball1_vx + 2 * ball2.getMass() * s_ball2_vx) / (ball1.getMass()+ball2.getMass());
         // 碰撞后ball1的s坐标系y轴的分速度
@@ -153,8 +154,8 @@ public class Space {
         // 碰撞后ball2的s坐标系y轴的分速度
         double s_ball2_vyfinal = s_ball2_vy;
 
-        //第五步：计算两球发生碰撞后在s中的各自合速度大小和运动方向
 
+        //第五步：计算两球发生碰撞后在s中的各自合速度大小和运动方向
         // 碰撞后ball1在s坐标系的合速度大小
         double s_ball1_vfinal = sqrt(pow(s_ball1_vxfinal, 2) + pow(s_ball1_vyfinal, 2));
         // 碰撞后ball1在s坐标系的运动方向
@@ -172,8 +173,8 @@ public class Space {
         else if (s_ball2_vyfinal != 0)
             s_ball2_anglefinal *= s_ball2_vyfinal / abs(s_ball2_vyfinal);
 
-        //第六步：将两球速度转化为原坐标系中的速度
 
+        //第六步：将两球速度转化为原坐标系中的速度
         // 碰撞后ball1在原坐标系的合速度大小
         double final_ball1_v = s_ball1_vfinal;
         // 碰撞后ball1在原坐标系的运动方向
@@ -199,6 +200,7 @@ public class Space {
         double final_ball2_vx = final_ball2_v * cos(final_ball2_angle);
         // 碰撞后ball2在原坐标系的合速度大小在y轴上的分量
         double final_ball2_vy = final_ball2_v * sin(final_ball2_angle) ;
+
 
         // 第七步：更新
         //ball1的x方向速度 = final_ball1_vx；
@@ -245,60 +247,77 @@ public class Space {
      *墙壁的碰撞检测与速度更新。
      */
     public void boardcheck(Ball ball) {
-        if (checkboardx(ball))
-            ball.setVelocityX(-ball.getVelocityX());
-        if (checkboardy(ball))
-            ball.setVelocityY(-ball.getVelocityY());
+        if (checkboardx(ball))     ball.setVelocityX(-ball.getVelocityX());
+        if (checkboardy(ball))     ball.setVelocityY(-ball.getVelocityY());
     }
 
+    /**
+     * 检查当前时间是否与用户提问的时间相同，误差范围为计算周期
+     * 命中时间则在命令行输出
+     */
     public void checktime(){
         for (double[] doubles : questionslist) {
             if (time - 0.5 * rate / 1000 < doubles[0] && time + 0.5 * rate / 1000 > doubles[0]) {
                 int index = (int) doubles[1];
                 if (!show) {
-                    StdOut.printf("\n" + time + "\n");
-                    StdOut.printf(balls[index].getBallRX() * boardlength + " " +
+                    //StdOut.printf("\n" + time + "\n");//打印当前时间
+                    StdOut.printf("\n" + balls[index].getBallRX() * boardlength + " " +
                             balls[index].getBallRY() * boardlength + " " +
                             balls[index].getVelocityX() * boardlength + " " +
-                            balls[index].getVelocityY() * boardlength);
+                            balls[index].getVelocityY() * boardlength + "\n");
                 }
             }
         }
     }
 
+    /**
+     *计算单元并根据用户输入显示GUI或命令行
+     */
     public void repaint(Ball[] balls){
+        colculate++;
         int n =balls.length;
+
+        //根据引力更新小球速度
         for (int i =0; i <n; i++){
             for (int j = i+1; j < n; j++){
-                forces[i][j].ChangeVelocityX();
-                forces[i][j].ChangeVelocityY();
+                forces[i][j].ChangeVelocityX(boardlength);
+                forces[i][j].ChangeVelocityY(boardlength);
             }
-        }
-        checktime();
-        if (show){
-            StdDraw.clear();
-            for (Ball ball : balls) {
-                ball.draw(1);
-            }
-            //显示缓存  在界面上 将所有缓存上用bufferGraphics画完的图形只用一次用之前界面上的画笔g展现处理啊
-            StdDraw.show();//0,65为图形左上角坐标     65为了不遮挡鼠标
         }
 
+        //时间检测
+        checktime();
+        if (show){
+            //计算GUI更新的时间，每1ms一更新
+            if (colculate%1 == 0){
+                StdDraw.clear();
+                for (Ball ball : balls) {
+                    ball.draw();
+                }
+                //显示缓存  在界面上 将所有缓存上用bufferGraphics画完的图形只用一次用之前界面上的画笔g展现处理啊
+                StdDraw.show();//0,65为图形左上角坐标     65为了不遮挡鼠标
+            }
+        }
+
+        //更新小球坐标及碰撞检测
         for (Ball ball : balls) {
             boardcheck(ball);
             ballcheck(balls);
             ball.ballMove();
         }
+
+        //更新引力
         for (int i =0; i <n; i++){
             for (int j = i+1; j < n; j++){
                 forces[i][j].setForce_x();
                 forces[i][j].setForce_y();
             }
         }
-        //每过10ms利用缓存将数组中全部的小球移动+画出+清屏
+
+        //每过1ms利用缓存将数组中全部的小球移动+画出+清屏
         try{
             //Thread.sleep(rate);
-            time += rate/1000.0;
+            time += rate/1000.0;//时间更新
         }catch(Exception e) {
             e.printStackTrace();
         }
@@ -307,7 +326,7 @@ public class Space {
     public void run() {
         if (show){
             StdDraw.setCanvasSize(800, 800);
-            StdDraw.enableDoubleBuffering();
+            StdDraw.enableDoubleBuffering();//GUI缓存区
         }
         while(true) {
             repaint(balls);
@@ -318,21 +337,20 @@ public class Space {
      *调试
      */
     public static void main(String[] args) {
-     Ball ball1 = new Ball(0.1,0.5,0,0,0.01,400000,0,250,0);
-     Ball ball2 = new Ball(0.48,0.5,0,0,0.01,400000,250,0,0);
-     Ball ball3 = new Ball(0.5,0.5,0,0,0.01,400000,250,0,250);
-     Ball ball4 = new Ball(0.52,0.5,0,0,0.01,400000,100,100,0);
+     //Ball ball1 = new Ball(0.1,0.5,0,0,0.01,400000,0,250,0);
+     //Ball ball2 = new Ball(0.48,0.5,0,0,0.01,400000,250,0,0);
+     //Ball ball3 = new Ball(0.5,0.5,0,0,0.01,400000,250,0,250);
+     //Ball ball4 = new Ball(0.52,0.5,0,0,0.01,400000,100,100,0);
      //Ball ball5 = new Ball(0.54,0.5,0,0,0.01,10000,100,0,100);
-     Ball[] balls = {ball1, ball2, ball3, ball4};
+     //Ball[] balls = {ball1, ball2, ball3, ball4};
      //Force[][] forces = null;
      //Space space = new Space(balls, 800);
      //space.run(balls);
-     // Ball ball1 = new Ball(0.2,0.2,0,0,0.15,2000000000,50,50,0);
-     // Ball ball2 = new Ball(0.8,0.2,0,0,0.10,2000000000,50,0,50);
-     //Ball[] balls = {ball1 , ball2};
+        Ball ball1 = new Ball(0.2,0.8,0,0,0.15,2000000000,50,50,0);
+        Ball ball2 = new Ball(0.2,0.2,0,0,0.10,2000000000,50,0,50);
+        Ball[] balls = {ball1 , ball2};
 
-     Space space = new Space(balls, 100, new double[1][2], true);
-     space.run();
-
+        Space space = new Space(balls, 100, new double[1][2], true);
+        space.run();
     }
 }

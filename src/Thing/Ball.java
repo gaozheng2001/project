@@ -6,7 +6,7 @@ import edu.princeton.cs.algs4.StdDraw;
 public class Ball {
 
 
-    public double rate = 0.001;
+    public double rate = 1.0/1000;//单位s
     private double ballRX;
     private double ballRY;
     private double BALL_R;
@@ -44,10 +44,6 @@ public class Ball {
 
     public double getMass() {
         return mass;
-    }
-
-    public void setRate(double rate) {
-        this.rate = rate;
     }
 
     public double getVelocityX() {
@@ -94,26 +90,15 @@ public class Ball {
         return BALL_R;
     }
 
-    public double Velocity(){
-        return Math.sqrt(Math.pow(velocityX, 2) + Math.pow(velocityY, 2));
-    }
-
-    public void velocityChange(double acceleratedX, double acceleratedY){
-        velocityX = velocityX + rate*acceleratedX;
-        velocityY = velocityY + rate*acceleratedY;
-    }
-
     public void ballMove() {
-            ballRX = ballRX + rate*velocityX;
-            ballRY = ballRY + rate*velocityY;
-        }
-    public void draw(int boardlength) {
-        //传入参数待修改
+        ballRX = ballRX + rate*velocityX;
+        ballRY = ballRY + rate*velocityY;
+    }
+
+    public void draw() {
         StdDraw.setPenColor(getBALL_COLOR());
-        StdDraw.filledCircle(getBallRX()/boardlength ,getBallRY()/boardlength , getBALL_R()/boardlength);
-
+        StdDraw.filledCircle(getBallRX(), getBallRY(), getBALL_R());
     }
-
-    }
+}
 
 
